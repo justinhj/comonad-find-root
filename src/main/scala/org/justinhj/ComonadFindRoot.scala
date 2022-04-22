@@ -17,6 +17,13 @@ object ComonadFindRoot extends App {
                      else 
                        FilenameUtils.getPrefix(pathString)
 
+
+    // TODO when using Duct, note that coflatten is still a Comonad because it is
+    // implemented using coFlatMap
+    // i.e.,
+    //   def coflatten[A](fa: F[A]): F[F[A]] =
+    //     coflatMap(fa)(fa => fa)
+
     val candidatePaths = fullPath.
                           split(File.separatorChar).
                           toList.
