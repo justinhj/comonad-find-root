@@ -5,7 +5,7 @@ lazy val fp1 = (project in file(".")).
     name := "comonadfindroot",
     organization := "org.example",
     version := "0.1-SNAPSHOT",
-    scalaVersion := "2.13.3"
+    scalaVersion := "2.13.8"
   )
 
 addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full)

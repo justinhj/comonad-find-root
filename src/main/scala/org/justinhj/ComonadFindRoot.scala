@@ -2,7 +2,6 @@ package org.justinhj
 
 import java.io.File
 import org.apache.commons.io.FilenameUtils
-
 import cats.implicits._
 
 object ComonadFindRoot extends App {
@@ -16,26 +15,26 @@ object ComonadFindRoot extends App {
                        File.separator
                      else 
                        FilenameUtils.getPrefix(pathString)
-
-
-    // TODO when using Duct, note that coflatten is still a Comonad because it is
-    // implemented using coFlatMap
-    // i.e.,
-    //   def coflatten[A](fa: F[A]): F[F[A]] =
-    //     coflatMap(fa)(fa => fa)
-
+                       
     val candidatePaths = fullPath.
                           split(File.separatorChar).
                           toList.
                           reverse.
-                          coflatten
+                          coflatMap(identity)
 
     def reversePathsToFile(paths: List[String], file: String = "") : File = {
       val path = pathPrefix + paths.reverse.intercalate(File.separator) + File.separator
       new File(path + file)
     }
 
-    candidatePaths.find(paths => {
+    println(s"found ${candidatePaths.length} candidate paths\n$candidatePaths")
+    val lazyPaths = LazyList(candidatePaths: _*)
+
+    // TODO this is nice and all
+    // but move it to Scala 3
+    // tidy up the path stuff
+    // needs to get the directory of files at each point and compare a regex
+    lazyPaths.first(paths => {
       rootFiles.find(rf => reversePathsToFile(paths, rf).exists()).isDefined
     }).map(reversePaths => reversePathsToFile(reversePaths))
   }
