@@ -15,28 +15,25 @@ object ComonadFindRoot extends App {
                        File.separator
                      else 
                        FilenameUtils.getPrefix(pathString)
-                       
+
+    def restorePathName(path: List[String]): String =
+      pathPrefix + path.reverse.intercalate(File.separator) + File.separator
+
     val candidatePaths = fullPath.
                           split(File.separatorChar).
                           toList.
                           reverse.
-                          coflatMap(identity)
-
-    def reversePathsToFile(paths: List[String], file: String = "") : File = {
-      val path = pathPrefix + paths.reverse.intercalate(File.separator) + File.separator
-      new File(path + file)
-    }
-
+                          coflatMap(identity).map(restorePathName)
+                          
     println(s"found ${candidatePaths.length} candidate paths\n$candidatePaths")
     val lazyPaths = LazyList(candidatePaths: _*)
 
     // TODO this is nice and all
     // but move it to Scala 3
-    // tidy up the path stuff
     // needs to get the directory of files at each point and compare a regex
     lazyPaths.first(paths => {
-      rootFiles.find(rf => reversePathsToFile(paths, rf).exists()).isDefined
-    }).map(reversePaths => reversePathsToFile(reversePaths))
+      rootFiles.find(rf => new File(paths, rf).exists()).isDefined
+    }).map(new File(_))
   }
 
   val cd = new File("/Users/justin.heyes-jones/projects/path-to-comonads/src/main/scala/org/justinhj/Pathtocomonads.scala")
